@@ -1,0 +1,114 @@
+-- Importamos las funciones necesarias
+USE master;
+GO
+
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID('sp_executesql') AND type IN ('P', 'PC'))
+BEGIN
+  EXEC sp_configure 'show advanced options', 1;
+  RECONFIGURE;
+  EXEC sp_configure 'Ad Hoc Distributed Queries', 1;
+  RECONFIGURE;
+END;
+GO
+
+-- Creamos las tablas
+CREATE TABLE global_units (
+  id INT IDENTITY(1,1) NOT NULL,
+  type VARCHAR(50) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  acronym VARCHAR(50) NOT NULL,
+  institution VARCHAR(255) NOT NULL,
+  active BIT NOT NULL,
+  PRIMARY KEY (id)
+);
+GO
+
+CREATE TABLE loc_elements (
+  id INT IDENTITY(1,1) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  iso_codes VARCHAR(255) NULL,
+  parent_location INT NULL,
+  element_type VARCHAR(50) NOT NULL,
+  geographic_position VARCHAR(255) NULL,
+  site_integration BIT NOT NULL,
+  active BIT NOT NULL,
+  created_by VARCHAR(255) NULL,
+  created_on DATETIME2 NULL,
+  modified_by VARCHAR(255) NULL,
+  modified_on DATETIME2 NULL,
+  justification_for_modification VARCHAR(255) NULL,
+  global_unit_id INT NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (global_unit_id) REFERENCES global_units (id)
+);
+GO
+
+CREATE TABLE project_policies (
+  id INT IDENTITY(1,1) NOT NULL,
+  project_id INT NOT NULL,
+  active BIT NOT NULL,
+  activated_on DATETIME2 NOT NULL,
+  created_by VARCHAR(255) NULL,
+  created_on DATETIME2 NULL,
+  modified_by VARCHAR(255) NULL,
+  modified_on DATETIME2 NULL,
+  justification_for_modification VARCHAR(255) NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (project_id) REFERENCES projects (id)
+);
+GO
+
+CREATE TABLE project_policy_countries (
+  project_policy_id INT NOT NULL,
+  country VARCHAR(255) NOT NULL,
+  phase VARCHAR(255) NOT NULL,
+  PRIMARY KEY (project_policy_id, country, phase),
+  FOREIGN KEY (project_policy_id) REFERENCES project_policies (id)
+);
+GO
+
+CREATE TABLE project_policy_geographic_scopes (
+  project_policy_id INT NOT NULL,
+  geographic_scope VARCHAR(255) NOT NULL,
+  phase VARCHAR(255) NOT NULL,
+  PRIMARY KEY (project_policy_id, geographic_scope, phase),
+  FOREIGN KEY (project_policy_id) REFERENCES project_policies (id)
+);
+GO
+
+CREATE TABLE project_policy_info (
+  id INT IDENTITY(1,1) NOT NULL,
+  project_policy_id INT NOT NULL,
+  year INT NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  description VARCHAR(MAX) NOT NULL,
+  other_information VARCHAR(MAX) NULL,
+  investment_type VARCHAR(50) NOT NULL,
+  amount DECIMAL(10,2) NOT NULL,
+  organization_type VARCHAR(50) NOT NULL,
+  stage_process VARCHAR(50) NOT NULL,
+  expected_study VARCHAR(50) NOT NULL,
+  has_milestones BIT NOT NULL,
+  narrative_evidence VARCHAR(MAX) NULL,
+  external_link VARCHAR(255) NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (project_policy_id) REFERENCES project_policies (id)
+);
+GO
+
+CREATE TABLE rep_ind_geographic_scopes (
+  id INT IDENTITY(1,1) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  iati_name VARCHAR(255) NOT NULL,
+  definition VARCHAR(MAX) NOT NULL,
+  PRIMARY KEY (id)
+----------------------------------------------------
+-- Cargar la información proporcionada
+
+USE [database_name];
+GO
+
+-- Ejecutamos las instrucciones SQL del archivo
+
+EXEC (BULK INFILE 'path_to_file/bi_test_create_schema_20231211.sql');
+GO
