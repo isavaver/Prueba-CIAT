@@ -1,0 +1,38 @@
+---CUBE CREATION 
+
+<transformation name="Cubo_Politicas">
+  <connection>
+    <name>Datawarehouse</name> --Se elimina para evitar errores
+    <server>localhost</server> --Se elimina para evitar errores
+    <database>my_database</database> --Se elimina para evitar errores
+    <user>my_user</user> --Se elimina para evitar errores
+    <password>my_password</password> --Se elimina para evitar errores
+  </connection>
+
+  <dimension name="project_policy">
+    <dimension-field name="id" type="integer" />
+    <foreign-key foreign-key-field="id" parent-dimension="global_units" />
+    <foreign-key foreign-key-field="id" parent-dimension="loc_elements" />
+    <foreign-key foreign-key-field="id" parent-dimension="rep_ind_geographic_scopes" />
+  </dimension>
+
+  <measure name="project_policy_info" type="integer">
+    <calculation>
+      <dimension name="project_policy" />
+      <fields>
+        <field name="year" />
+        <field name="title" />
+        <field name="description" />
+      </fields>
+    </calculation>
+  </measure>
+
+  <cube name="Cubo_Politicas">
+    <dimensions>
+      <dimension name="project_policy" />
+    </dimensions>
+    <measures>
+      <measure name="project_policy_info" />
+    </measures>
+  </cube>
+</transformation>
